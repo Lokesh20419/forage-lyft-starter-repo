@@ -21,13 +21,14 @@ class Engine(Serviceable):
 
 
 class CapuletEngine(Engine):
+    SERVICE_INTERVAL = 30000
+
     def __init__(self, last_service_mileage, current_mileage):
         self.last_service_mileage = last_service_mileage
         self.current_mileage = current_mileage
 
     def needs_service(self) -> bool:
-        # Your logic to determine if the CapuletEngine needs service
-        pass
+        return self.current_mileage - self.last_service_mileage >= self.SERVICE_INTERVAL
 
 
 class SternmanEngine(Engine):
@@ -35,18 +36,18 @@ class SternmanEngine(Engine):
         self.warning_light_on = warning_light_on
 
     def needs_service(self) -> bool:
-        # Your logic to determine if the SternmanEngine needs service
-        pass
+        return self.warning_light_on
 
 
 class WilloughbyEngine(Engine):
+    SERVICE_INTERVAL = 60000
+
     def __init__(self, last_service_mileage, current_mileage):
         self.last_service_mileage = last_service_mileage
         self.current_mileage = current_mileage
 
     def needs_service(self) -> bool:
-        # Your logic to determine if the WilloughbyEngine needs service
-        pass
+        return self.current_mileage - self.last_service_mileage >= self.SERVICE_INTERVAL       
 
 
 class CarFactory:
@@ -92,8 +93,9 @@ class SpindlerBattery(Battery):
         self.current_date = current_date
 
     def needs_service(self) -> bool:
-        # Your logic to determine if the SpindlerBattery needs service
-        pass
+        service_threshold_date = self.last_service_date.replace(year=self.last_service_date.year + 2)
+        return service_threshold_date < self.current_date
+
 
 
 class NubbinBattery(Battery):
@@ -102,5 +104,19 @@ class NubbinBattery(Battery):
         self.current_date = current_date
 
     def needs_service(self) -> bool:
-        # Your logic to determine if the NubbinBattery needs service
-        pass
+        service_threshold_date = self.last_service_date.replace(year=self.last_service_date.year + 4)
+        return service_threshold_date < self.current_date
+
+class Tire(Serviceable):
+    def __init__(self, tire_wear):
+        self.tire_wear = tire_wear
+
+
+class CarriganTire(Tire):
+    def needs_service(self) -> bool:
+        return any(wear >= 0.9 for wear in self.tire_wear)
+
+
+class OctoprimeTire(Tire):
+    def needs_service(self) -> bool:
+        return sum(self.tire_wear) >= 3.0
